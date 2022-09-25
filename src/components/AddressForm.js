@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import "./index.css";
 
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
@@ -7,46 +7,38 @@ import Row from "react-bootstrap/Row";
 
 import db from "../firebase-config";
 import { collection, addDoc } from "firebase/firestore";
-import useFormik from "formik";
+import { useFormik } from "formik";
+import { AddressSchema } from "../schemas/index";
+
+const initialValues = {
+  Fname: "",
+  Lname: "",
+  Email: "",
+  Address: "",
+  City: "",
+  State: "",
+  Zip: "",
+};
 
 function AddressForm() {
-  useFormik({
-    initialValues: initialValues,
-    onSubmit: (values) => {
-      console.log(values);
-    },
-  });
-
-  const [Fname, setFname] = useState("");
-  const [Lname, setLname] = useState("");
-  const [Email, setEmail] = useState("");
-  const [Address, setAddress] = useState("");
-  const [City, setCity] = useState("");
-  const [State, setState] = useState("");
-  const [Zip, setZip] = useState("");
-
   const userCollectionRef = collection(db, "users");
 
-  //   function submitButton() {
-  //     console.log(Fname, Lname, Address, City, State, Zip);
-  //   }
-
-  async function createUser() {
-    const user = {
-      Fname,
-      Lname,
-      Email,
-      Address,
-      City,
-      State,
-      Zip,
-    };
-    await addDoc(userCollectionRef, user);
-  }
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
+    useFormik({
+      initialValues: initialValues,
+      validationSchema: AddressSchema,
+      onSubmit: async (values, action) => {
+        console.log(values);
+        await addDoc(userCollectionRef, values);
+        action.resetForm();
+      },
+    });
+  // console.log(formik);
+  // console.log(errors);
 
   return (
     <div className="container py-5">
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <Row className="mb-3">
           <Form.Group as={Col} controlId="formGridFname">
             <Form.Label>First Name</Form.Label>
@@ -54,8 +46,13 @@ function AddressForm() {
               name="Fname"
               type="text"
               placeholder="First Name"
-              onChange={(e) => setFname(e.target.value)}
+              value={values.Fname}
+              onChange={handleChange}
+              onBlur={handleBlur}
             />
+            {errors.Fname && touched.Fname ? (
+              <p className="error-class">{errors.Fname}</p>
+            ) : null}
           </Form.Group>
 
           <Form.Group as={Col} controlId="formGridLname">
@@ -64,70 +61,96 @@ function AddressForm() {
               name="Lname"
               type="text"
               placeholder="Last Name"
-              onChange={(e) => setLname(e.target.value)}
+              value={values.Lname}
+              onChange={handleChange}
+              onBlur={handleBlur}
             />
+            {errors.Lname && touched.Lname ? (
+              <p className="error-class">{errors.Lname}</p>
+            ) : null}
           </Form.Group>
         </Row>
-
         <Form.Group as={Col} controlId="formGridEmail">
           <Form.Label>Email</Form.Label>
           <Form.Control
             name="Email"
             type="email"
             placeholder="Enter email"
-            onChange={(e) => setEmail(e.target.value)}
+            value={values.Email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            // onChange={(e) => setEmail(e.target.value)}
           />
+          {errors.Email && touched.Email ? (
+            <p className="error-class">{errors.Email}</p>
+          ) : null}
         </Form.Group>
-
         <Form.Group className="mb-3" controlId="formGridAddress1">
           <Form.Label>Address</Form.Label>
           <Form.Control
             name="Address"
             placeholder="1234 Main St"
-            onChange={(e) => setAddress(e.target.value)}
+            value={values.Address}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            // onChange={(e) => setAddress(e.target.value)}
           />
+          {errors.Address && touched.Address ? (
+            <p className="error-class">{errors.Address}</p>
+          ) : null}
         </Form.Group>
-
         <Row className="mb-3">
           <Form.Group as={Col} controlId="formGridCity">
             <Form.Label>City</Form.Label>
             <Form.Control
               name="City"
-              onChange={(e) => setCity(e.target.value)}
+              value={values.City}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              // onChange={(e) => setCity(e.target.value)}
             />
+            {errors.City && touched.City ? (
+              <p className="error-class">{errors.City}</p>
+            ) : null}
           </Form.Group>
 
           <Form.Group as={Col} controlId="formGridState">
             <Form.Label>State</Form.Label>
             <Form.Control
               name="State"
-              onChange={(e) => setState(e.target.value)}
+              value={values.State}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              // onChange={(e) => setState(e.target.value)}
             />
+            {errors.State && touched.State ? (
+              <p className="error-class">{errors.State}</p>
+            ) : null}
           </Form.Group>
 
           <Form.Group as={Col} controlId="formGridZip">
             <Form.Label>Zip</Form.Label>
-            <Form.Control name="Zip" onChange={(e) => setZip(e.target.value)} />
+            <Form.Control
+              name="Zip"
+              value={values.Zip}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              // onChange={(e) => setZip(e.target.value)}
+            />
+            {errors.Zip && touched.Zip ? (
+              <p className="error-class">{errors.Zip}</p>
+            ) : null}
           </Form.Group>
         </Row>
-
         {/* <Form.Group className="mb-3" id="formGridCheckbox">
           <Form.Check type="checkbox" label="Check me out" />
         </Form.Group> */}
 
-        <Button variant="primary" type="submit" onClick={createUser}>
+        {/* onClick={createUser} */}
+        <Button variant="primary" type="submit">
           Submit
         </Button>
       </Form>
-      {/* <div>
-        <p>Fname: {Fname}</p>
-        <p>Lname : {Lname}</p>
-        <p>Email : {Email}</p>
-        <p>Address : {Address}</p>
-        <p>City : {City}</p>
-        <p>State : {State}</p>
-        <p>Zip : {Zip}</p>
-      </div> */}
     </div>
   );
 }
